@@ -15,6 +15,5 @@ RUN systemctl enable named.service
 # Copy in default zone content
 COPY --chown=named:named db.* /var/named/dynamic/
 RUN chmod 644 /var/named/dynamic/db.*
-RUN /usr/sbin/named -u named -c /etc/named.conf
 # Run eternal loop
 CMD ["/bin/bash", "-c", "/usr/sbin/named -u named -c /etc/named.conf && while :; do sleep 10; done"]
