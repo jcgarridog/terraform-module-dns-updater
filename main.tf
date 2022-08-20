@@ -40,27 +40,48 @@ terraform {
   }
 }
 
+provider "dns" {
+  update {
+    server = "${var.dns_server}"
+  }  
+}
 
 # ------------------------------------------
 # Write your local resources here
 # ------------------------------------------
 
 locals {
-
+  json_files = fileset("./examples/exercise/input-json", "*.json")   
+  json_data  = [ for f in local.json_files : jsondecode(file("${path.module}/examples/exercise/input-json/${f}")) ]  
 }
-
 
 # ------------------------------------------
 # Write your Terraform resources here
 # ------------------------------------------
 
-resource "dns_a_record_set" "www" {
-  zone = "example.com."
-  name = "www"
-  addresses = [
-    "192.168.0.1",
-    "192.168.0.2",
-    "192.168.0.3",
-  ]
-  ttl = 300
+output "files" {
+  value = "${local.json_files}"
 }
+
+output "data" {
+  value = "${local.json_data}"
+}
+
+#resource "dns_a_record_set" "template" {
+#    for_each  = { for f in local.json_files : }
+#    name      = each.key
+#    zone      = "example.com."
+#    addresses = each.value.addresses
+#    ttl       = each.value.ttl
+#}
+
+#resource "dns_a_record_set" "www" {
+#  zone = "example.com."
+#  name = "www"
+#  addresses = [
+#    "192.168.0.1",
+#    "192.168.0.2",
+#    "192.168.0.3",
+#  ]
+#  ttl = 300
+#}
